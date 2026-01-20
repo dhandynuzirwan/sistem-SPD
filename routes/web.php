@@ -3,6 +3,7 @@
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LetterController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,16 +18,19 @@ Route::get('/finance-dashboard', function () {
 })->name('dashboard'); // Menambahkan nama 'dashboard'
 
 // Data Pegawai (Sudah benar menggunakan Resource)
-Route::resource('employees', EmployeeController::class);
 
-Route::resource('budgets', BudgetController::class);
+// Route::middleware(['auth', 'role:finance'])->group(function () {
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('budgets', BudgetController::class);
+    Route::resource('letters', LetterController::class);
+    Route::resource('reports', ReportController::class);
+// });
 
-Route::resource('letters', LetterController::class);
 
 // Laporan Perjalanan Dinas (LPD)
-Route::get('/finance-lpd', function () {
-    return view('finance.lpd.index'); 
-})->name('reports.index');
+// Route::get('/finance-lpd', function () {
+//     return view('finance.lpd.index'); 
+// })->name('reports.index');
 
 // // Surat Perjalanan Dinas (SPD)
 // Route::get('/finance-spd', function () {
