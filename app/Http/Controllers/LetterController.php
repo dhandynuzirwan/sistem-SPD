@@ -3,13 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Letter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LetterController extends Controller
 {
     public function index() {
-        $letters = Letter::with(['finance', 'director', 'employee', 'budget'])->get();
-        return view('finance.spd.index', compact('letters'));
+        $role = Auth::user()->employee->role;
+        $letters = Letter::with(['finance', 'director', 'employee', 'budget'])->get();    
+        
+        if ($role === 'employee') {
+            // Pegawai hanya melihat miliknya sendiri
+            $letters = \App\Models\Letter::where('employee_id', Auth::user()->employee->id)->get();
+        } else {
+            // Finance dan Director melihat semua laporan
+            $letters = \App\Models\Letter::all();
+        }   
+
+        return match($role) {
+            'employee' => view('employee.spd.index', compact('letters')),
+            'finance'  => view('finance.spd.index', compact('letters')),
+            'director' => view('director.spd.index', compact('letters')),
+            default    => abort(403, 'Akses Ditolak'),
+        };
     }
     public function create() {
         // Menggunakan whereRaw agar 'Finance', 'finance', atau 'FINANCE' tetap terpanggil
@@ -89,5 +106,27 @@ class LetterController extends Controller
 
         return redirect()->route('letters.index')
                         ->with('success', 'Surat Perjalanan Dinas berhasil dihapus!');
+    }
+
+    public function approve($id)
+    {
+        $letter = \App\Models\Letter::findOrFail($id);
+        
+        // Update status
+        $letter->update([
+            'status' => 'approved'
+        ]);
+
+        return redirect()->back()->with('success', 'Surat Perjalanan Dinas berhasil disetujui.');
+    }
+
+    public function print($id)
+    {
+        $letter = \App\Models\Letter::with(['finance', 'employee', 'director', 'budget'])->findOrFail($id);
+        
+        $pdf = Pdf::loadView('finance.spd.print', compact('letter'));
+        
+        // Gunakan stream() untuk melihat preview di browser
+        return $pdf->stream('SPD-' . $letter->letter_number . '.pdf');
     }
 }

@@ -69,44 +69,47 @@
                         </a>
                         <div class="clearfix"></div>
 
-                        <div class="collapse in" id="collapseExample" aria-expanded="true" style="">
+                        <div class="collapse in" id="collapseExample" aria-expanded="true">
                             <ul class="nav">
                                 <li>
-                                    <a href="#logout">
-                                        <span class="link-collapse">logout</span>
+                                    <a href="{{ route('logout') }}" 
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <span class="link-collapse">Logout</span>
                                     </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        @csrf
+                                    </form>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <ul class="nav">
-                    <li class="nav-item active">
-                        <a href="index.html">
+                    <li class="nav-item {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('employee.dashboard') }}">
                             <i class="la la-dashboard"></i>
                             <p>Dashboard</p>
                         </a>
                     </li>
-
-                    <li class="nav-item">
-                        <a href="lpd.html">
-                            <i class="la la-file-text-o"></i>
-                            <p>Laporan Perjalanan Dinas</p>
-                            <span class="badge badge-danger">3</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="spd.html">
+                    {{-- @if(Auth::user()->employee->role == 'finance') --}}
+                    <li class="nav-item {{ request()->routeIs('letters.*') ? 'active' : '' }}">
+                        <a href="{{ route('letters.index') }}">
                             <i class="la la-file-archive-o"></i>
                             <p>Surat Perjalanan Dinas</p>
-                            <span class="badge badge-danger">3</span>
+                            <span class="badge badge-success">2</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="budget.html">
-                            <i class="la la-th-list"></i>
+                    {{-- @endif --}}
+                    <li class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                        <a href="{{ route('reports.index') }}">
+                            <i class="la la-file-text-o"></i>
+                            <p>Laporan Perjalanan</p>
+                        </a>
+                    </li>
+                    <li class="nav-item {{ request()->routeIs('budget.*') ? 'active' : '' }}">
+                        <a href="{{ route('budgets.index') }}">
+                            <i class="la la-money"></i>
                             <p>Cetak Kwitansi</p>
-                            <span class="badge badge-danger">3</span>
                         </a>
                     </li>
                 </ul>

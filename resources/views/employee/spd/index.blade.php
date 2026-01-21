@@ -1,6 +1,6 @@
 @extends('layouts.app') @section('content')
     <div class="wrapper">
-        @include('employee.navbar')
+        @include('layouts.navbar')
         <div class="main-panel">
             <div class="content">
                 <div class="container-fluid">
@@ -34,66 +34,46 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @forelse($letters as $index => $letter)
                                             <tr>
-                                                <th scope="row">1</th>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td><span class="badge badge-count">Menunggu</span></td>
+                                                <th scope="row">{{ $index + 1 }}</th>
+                                                <td>{{ $letter->letter_number }}</td>
+                                                <td>{{ $letter->finance->full_name }}</td>
+                                                <td>{{ $letter->employee->full_name }}</td>
+                                                <td>{{ $letter->director->full_name }}</td>
+                                                <td>{{ $letter->budget->id_budget }}</td>
+                                                <td>{{ $letter->cost_level }}</td>
+                                                <td>{{ $letter->subject }}</td>
+                                                <td>{{ $letter->transportation }}</td>
+                                                <td>{{ $letter->departure_date }}</td>
+                                                <td>{{ $letter->return_date }}</td>
+                                                <td>{{ $letter->follower }}</td>
+                                                <td>{{ $letter->description }}</td>
+                                                <td>{{ $letter->institution }}</td>
                                                 <td>
-                                                    <button class="btn btn-default mb-1"><i class="la la-print"></i></button>
+                                                    @if($letter->status == 'pending')
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    @elseif($letter->status == 'approved')
+                                                        <span class="badge badge-success">Disetujui</span>
+                                                    @else
+                                                        <span class="badge badge-danger">Ditolak</span>
+                                                    @endif
                                                 </td>
+                                                <td>
+                                                    @if($letter->status == 'approved')
+                                                        <a href="{{ route('letters.print', $letter->id) }}" class="btn btn-info mb-1" target="_blank">
+                                                            <i class="la la-print"></i>
+                                                        </a>
+                                                    @else
+                                                        <button class="btn btn-secondary mb-1" disabled><i class="la la-print"></i></button>
+                                                    @endif
+                                                </td>   
                                             </tr>
+                                            @empty
                                             <tr>
-                                                <th scope="row">2</th>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td><span class="badge badge-success">Disetujui</span></td>
-                                                <td>
-                                                    <button class="btn btn-default mb-1"><i class="la la-print"></i></button>
-                                                </td>
+                                                <td colspan="16" class="text-center">Tidak ada data surat perjalanan dinas.</td>
                                             </tr>
-                                            <tr>
-                                                <th scope="row">3</th>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td>Table cell</td>
-                                                <td><span class="badge badge-success">Disetujui</span></td>
-                                                <td>
-                                                    <button class="btn btn-default mb-1"><i class="la la-print"></i></button>
-                                                </td>
-                                            </tr>
+                                            @endforelse                                                                          
                                         </tbody>
                                     </table>
                                 </div>

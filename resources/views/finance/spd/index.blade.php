@@ -1,7 +1,7 @@
 @extends('layouts.app') @section('content')
 
 <div class="wrapper">
-        @include('finance.navbar')
+        @include('layouts.navbar')
         <div class="main-panel">
             <div class="content">
                 <div class="container-fluid">
@@ -64,7 +64,9 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-default mb-1"><i class="la la-print"></i></button>
+                                                    <a href="{{ route('letters.print', $letter->id) }}" class="btn btn-info mb-1" target="_blank">
+                                                        <i class="la la-print"></i>
+                                                    </a>
                                                     <button class="btn btn-primary mb-1"><i class="la la-edit"></i></button>
                                                     <form action="{{ route('letters.destroy', $letter->id) }}" method="POST" style="display: inline;">
                                                         @csrf

@@ -1,7 +1,7 @@
 @extends('layouts.app') @section('content')
 
 <div class="wrapper">
-        @include('finance.navbar')
+        @include('layouts.navbar')
         <div class="main-panel">
             <div class="content">
                 <div class="container-fluid">

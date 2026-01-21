@@ -12,19 +12,15 @@
                             <div class="card-body p-5">
                                 <h3 class="text-center mb-4">Welcome Back!</h3>
                                 <div class="login-form">
-                                    <form action="../../index.html">
-                                        <div class="form-group">
-                                            <label for="username" class="placeholder">Username</label>
-                                            <input id="username" type="text" class="form-control" required>
+                                    <form action="{{ route('login') }}" method="POST"> 
+                                        @csrf    
+                                        <div class="form-group mb-3">
+                                            <label for="username">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="password" class="placeholder">Password</label>
-                                            <div class="position-relative">
-                                                <input id="password" type="password" class="form-control" required>
-                                                <div class="show-password">
-                                                    <i class="icon-eye"></i>
-                                                </div>
-                                            </div>
+                                        <div class="form-group mb-3">
+                                            <label for="password">Password</label>
+                                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox">

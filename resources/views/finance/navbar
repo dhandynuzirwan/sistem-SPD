@@ -62,61 +62,65 @@
                     <div class="info">
                         <a class="" data-toggle="collapse" href="#collapseExample" aria-expanded="true">
                             <span>
-									Nama Lengkap
-									<span class="user-level">Finance</span>
-                            <span class="caret"></span>
+                                {{ Auth::user()->employee->full_name }}
+                                <span class="user-level">{{ ucfirst(Auth::user()->employee->role) }}</span>
+                                <span class="caret"></span>
                             </span>
                         </a>
                         <div class="clearfix"></div>
 
-                        <div class="collapse in" id="collapseExample" aria-expanded="true" style="">
+                        <div class="collapse in" id="collapseExample" aria-expanded="true">
                             <ul class="nav">
                                 <li>
-                                    <a href="#logout">
-                                        <span class="link-collapse">logout</span>
+                                    <a href="{{ route('logout') }}" 
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <span class="link-collapse">Logout</span>
                                     </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        @csrf
+                                    </form>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <ul class="nav">
-    <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-        <a href="{{ route('dashboard') }}">
-            <i class="la la-dashboard"></i>
-            <p>Dashboard</p>
-        </a>
-    </li>
+                    <li class="nav-item {{ request()->routeIs('finance.dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('finance.dashboard') }}">
+                            <i class="la la-dashboard"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
 
-    <li class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-        <a href="{{ route('employees.index') }}">
-            <i class="la la-users"></i>
-            <p>Data Pegawai</p>
-        </a>
-    </li>
+                    <li class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                        <a href="{{ route('employees.index') }}">
+                            <i class="la la-users"></i>
+                            <p>Data Pegawai</p>
+                        </a>
+                    </li>
 
-    <li class="nav-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
-        <a href="{{ route('budgets.index') }}">
-            <i class="la la-money"></i>
-            <p>Data Anggaran</p>
-        </a>
-    </li>
+                    <li class="nav-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
+                        <a href="{{ route('budgets.index') }}">
+                            <i class="la la-money"></i>
+                            <p>Data Anggaran</p>
+                        </a>
+                    </li>
 
-    <li class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
-        <a href="{{ route('reports.index') }}">
-            <i class="la la-file-text-o"></i>
-            <p>Laporan Perjalanan Dinas</p>
-            <span class="badge badge-danger">3</span>
-        </a>
-    </li>
-
-    <li class="nav-item {{ request()->routeIs('letters.*') ? 'active' : '' }}">
-        <a href="{{ route('letters.index') }}">
-            <i class="la la-file-archive-o"></i>
-            <p>Surat Perjalanan Dinas</p>
-            <span class="badge badge-success">2</span>
-        </a>
-    </li>
-</ul>
+                    {{-- @if(Auth::user()->employee->role == 'finance') --}}
+                    <li class="nav-item {{ request()->routeIs('letters.*') ? 'active' : '' }}">
+                        <a href="{{ route('letters.index') }}">
+                            <i class="la la-file-archive-o"></i>
+                            <p>Surat Perjalanan Dinas</p>
+                            <span class="badge badge-success">2</span>
+                        </a>
+                    </li>
+                    {{-- @endif --}}
+                    <li class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                        <a href="{{ route('reports.index') }}">
+                            <i class="la la-file-text-o"></i>
+                            <p>Laporan Perjalanan</p>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
