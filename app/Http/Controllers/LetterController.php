@@ -9,18 +9,36 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class LetterController extends Controller
 {
-    public function index() {
-        $role = Auth::user()->employee->role;
-        $letters = Letter::with(['finance', 'director', 'employee', 'budget'])->get();    
-        
-        if ($role === 'employee') {
-            // Pegawai hanya melihat miliknya sendiri
-            $letters = \App\Models\Letter::where('employee_id', Auth::user()->employee->id)->get();
-        } else {
-            // Finance dan Director melihat semua laporan
-            $letters = \App\Models\Letter::all();
-        }   
+    public function index(Request $request) {
+        $user = Auth::user();
+        $role = $user->employee->role;
 
+        // 1. Inisialisasi Query dengan Eager Loading agar tidak N+1
+        $query = \App\Models\Letter::with(['finance', 'director', 'employee', 'budget']);
+
+        // 2. Role-Based Scoping (Keamanan Data)
+        if ($role === 'employee') {
+            $query->where('employee_id', $user->employee->id);
+        }
+
+        // 3. Fungsi SEARCH (Berguna untuk input search di navbar)
+        $query->when($request->search, function ($q) use ($request) {
+            $q->where(function ($inner) use ($request) {
+                $inner->where('letter_number', 'like', '%' . $request->search . '%')
+                    ->orWhere('subject', 'like', '%' . $request->search . '%')
+                    ->orWhere('institution', 'like', '%' . $request->search . '%');
+            });
+        });
+
+        // 4. Fungsi FILTER STATUS (Berguna untuk klik notifikasi "Pending")
+        $query->when($request->status, function ($q) use ($request) {
+            $q->where('status', $request->status);
+        });
+
+        // 5. Eksekusi Query
+        $letters = $query->latest()->get();
+
+        // 6. Return View berdasarkan Role
         return match($role) {
             'employee' => view('employee.spd.index', compact('letters')),
             'finance'  => view('finance.spd.index', compact('letters')),
@@ -126,7 +144,48 @@ class LetterController extends Controller
         
         $pdf = Pdf::loadView('finance.spd.print', compact('letter'));
         
-        // Gunakan stream() untuk melihat preview di browser
-        return $pdf->stream('SPD-' . $letter->letter_number . '.pdf');
+        // Sanitasi nomor surat: ubah '/' menjadi '-' agar tidak error
+        $fileName = 'SPD-' . str_replace('/', '-', $letter->letter_number) . '.pdf';
+        
+        // Gunakan nama file yang sudah dibersihkan
+        return $pdf->stream($fileName);
+    }
+
+    private function terbilang($angka) {
+        $angka = abs($angka);
+        $baca = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+        $terbilang = "";
+
+        if ($angka < 12) { $terbilang = " " . $baca[$angka]; }
+        elseif ($angka < 20) { $terbilang = $this->terbilang($angka - 10) . " Belas"; }
+        elseif ($angka < 100) { $terbilang = $this->terbilang($angka / 10) . " Puluh" . $this->terbilang($angka % 10); }
+        elseif ($angka < 200) { $terbilang = " Seratus" . $this->terbilang($angka - 100); }
+        elseif ($angka < 1000) { $terbilang = $this->terbilang($angka / 100) . " Ratus" . $this->terbilang($angka % 100); }
+        elseif ($angka < 2000) { $terbilang = " Seribu" . $this->terbilang($angka - 1000); }
+        elseif ($angka < 1000000) { $terbilang = $this->terbilang($angka / 1000) . " Ribu" . $this->terbilang($angka % 1000); }
+        elseif ($angka < 1000000000) { $terbilang = $this->terbilang($angka / 1000000) . " Juta" . $this->terbilang($angka % 1000000); }
+
+        return $terbilang;
+    }
+    
+    public function printKwitansi($id) {
+        // 1. Ambil data spesifik berdasarkan ID
+        $letter = \App\Models\Letter::with(['employee', 'budget', 'finance'])->findOrFail($id);
+
+        // 2. Security Check (Penting!)
+        // Mencegah pegawai iseng mengganti ID di URL untuk melihat kwitansi orang lain
+        if (Auth::user()->employee->role === 'employee' && $letter->employee_id !== Auth::user()->employee->id) {
+            abort(403, 'Akses ditolak. Ini bukan kwitansi Anda.');
+        }
+
+        // 3. Logika Terbilang
+        $terbilang = trim($this->terbilang($letter->budget->total)) . " Rupiah";
+        
+        // 4. Generate PDF
+        $pdf = Pdf::loadView('employee.spd.kwitansi', compact('letter', 'terbilang'));
+        
+        // 5. Sanitasi Nama File
+        $fileName = 'Kwitansi-' . str_replace('/', '-', $letter->letter_number) . '.pdf';
+        return $pdf->stream($fileName);
     }
 }

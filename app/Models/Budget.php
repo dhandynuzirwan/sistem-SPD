@@ -23,4 +23,10 @@ class Budget extends Model
         return 'Rp ' . number_format($this->total, 0, ',', '.');
     }
 
+    public function letter()
+    {
+        // Karena di tabel letters ada budget_id, maka Budget 'hasOne' Letter
+        return $this->hasOne(Letter::class, 'budget_id');
+    }
+
 }

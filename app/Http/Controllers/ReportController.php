@@ -79,7 +79,7 @@ class ReportController extends Controller
             'destination'   => 'required|string|max:255',
             'date'          => 'required|date',
             'subject'       => 'required|string|max:255',
-            'report_file'   => 'required|file|mimes:pdf,jpg,png|max:2048', // Ubah ke file (max 2MB)
+            'report_file'   => 'required|file|mimes:pdf,jpg,png|max:10240', // Ubah ke file (max 10MB)
         ]);
 
         // 2. Olah File yang Diunggah
@@ -123,7 +123,7 @@ class ReportController extends Controller
         'destination'   => 'required|string|max:255',
         'date'          => 'required|date',
         'subject'       => 'required|string',
-        'report_file'   => 'nullable|file|mimes:pdf,jpg,png|max:2048', // nullable karena bersifat opsional saat edit
+        'report_file'   => 'nullable|file|mimes:pdf,jpg,png|max:10240', // nullable karena bersifat opsional saat edit
     ]);
 
     $data = $request->all();

@@ -90,8 +90,18 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         $employee = \App\Models\Employee::findOrFail($id);
-        $employee->delete();
 
-        return redirect()->route('employees.index')->with('success', 'Pegawai berhasil dihapus');
+        try {
+            $employee->delete();
+            return redirect()->route('employees.index')->with('success', 'Pegawai berhasil dihapus');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Cek jika error disebabkan oleh Foreign Key Constraint (SQLSTATE 23000)
+            if ($e->getCode() == "23000" || $e->errorInfo[1] == 19) {
+                return redirect()->back()->with('error', 'Data tidak dapat dihapus karena terhubung dengan data lain.');
+            }
+
+            // Jika ada error database lain yang tidak kita duga
+            return redirect()->back()->with('error', 'Terjadi kesalahan pada database.');
+        }
     }
 }

@@ -10,21 +10,63 @@
     </div>
     <nav class="navbar navbar-header navbar-expand-lg">
         <div class="container-fluid">
-            <form class="navbar-left navbar-form nav-search mr-md-3" action="">
+            <form class="navbar-left navbar-form nav-search mr-md-3" action="{{ route('letters.index') }}" method="GET">
                 <div class="input-group">
-                    <input type="text" placeholder="Search ..." class="form-control">
+                    <input type="text" name="search" placeholder="Cari Nomor Surat ..." class="form-control" value="{{ request('search') }}">
                     <div class="input-group-append">
-                        <span class="input-group-text"><i class="la la-search search-icon"></i></span>
+                        <button type="submit" class="btn p-0 bg-transparent border-0" style="box-shadow: none;">
+                            <span class="input-group-text bg-transparent border-0">
+                                <i class="la la-search search-icon"></i>
+                            </span>
+                        </button>
                     </div>
-                </div>
+                </div>                
             </form>
             <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
                 <li class="nav-item dropdown hidden-caret">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="la la-bell"></i>
-                        <span class="notification">3</span>
+                        @if($pendingNotificationCount > 0)
+                            <span class="notification">{{ $pendingNotificationCount }}</span>
+                        @endif
                     </a>
-                    </li>
+                    
+                    <ul class="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown">
+                        <li>
+                            <div class="dropdown-title">
+                                {{ Auth::user()->employee->role === 'employee' ? 'Update Status SPD Anda' : 'Ada ' . $pendingNotificationCount . ' surat perlu persetujuan' }}
+                            </div>
+                        </li>
+                        <li>
+                            <div class="notif-center">
+                                @forelse($listNotifications as $notif)
+                                    <a href="{{ route('letters.index', ['search' => $notif->letter_number]) }}" class="dropdown-item border-bottom p-3">
+                                        {{-- Warna icon berubah sesuai status --}}
+                                        <div class="notif-icon {{ $notif->status === 'approved' ? 'notif-success' : ($notif->status === 'rejected' ? 'notif-danger' : 'notif-primary') }}"> 
+                                            <i class="la {{ $notif->status === 'approved' ? 'la-check' : ($notif->status === 'rejected' ? 'la-close' : 'la-file-text') }}"></i> 
+                                        </div>
+                                        <div class="notif-content">
+                                            <span class="block font-weight-bold">
+                                                {{ $notif->letter_number }}
+                                            </span>
+                                            <span class="time" style="font-size: 11px; display: block;">
+                                                @if($notif->status === 'approved')
+                                                    <span class="text-success">Selamat! Pengajuan Anda disetujui.</span>
+                                                @elseif($notif->status === 'rejected')
+                                                    <span class="text-danger">Maaf, pengajuan Anda ditolak.</span>
+                                                @else
+                                                    {{ $notif->subject }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="text-center p-3 text-muted">Belum ada notifikasi baru</div>
+                                @endforelse
+                            </div>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </nav>
@@ -106,7 +148,7 @@
             </li>
 
             @if(Auth::user()->employee->role == 'employee')
-                <li class="nav-item {{ request()->routeIs('budgets.index') && request()->is('*employee*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
                     <a href="{{ route('budgets.index') }}">
                         <i class="la la-money"></i>
                         <p>Cetak Kwitansi</p>

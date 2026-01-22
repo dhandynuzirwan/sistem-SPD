@@ -9,11 +9,12 @@
                 <div class="row">
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">Data Anggaran</div>
-                        </div>
+                                <div class="card-title">Buat Anggaran</div>
+                                <p class="card-category">Daftar anggaran perjalanan dinas.</p>
+                            </div>
                         <div class="card-body">
                             <a href="{{ route('budgets.create') }}">
-                                <button class="btn btn-success mb-3">Anggaran</button>
+                                <button class="btn btn-success mb-3">Buat Anggaran</button>
                             </a>
                             <div class="table-responsive">
                                 <table class="table table-bordered">

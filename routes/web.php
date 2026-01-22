@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('budgets', BudgetController::class);
 
     Route::get('/letters/{id}/print', [LetterController::class, 'print'])->name('letters.print');
+    Route::get('/budget/{id}/kwitansi', [BudgetController::class, 'printKwitansi'])->name('budget.print');
 });
 
 
